@@ -2,10 +2,14 @@
 
 import pandas as pd
 import numpy as np
+import os
+# 忽略所有warning
+import warnings
+warnings.filterwarnings('ignore')
 
 from sklearn.base import clone
 
-from convst.utils.dataset_utils import load_sktime_dataset_split
+from convst.utils.dataset_utils import load_UCR_UEA_dataset_split
 from convst.classifiers import R_DST_Ridge, R_DST_Ensemble
 
 from sktime.classification.hybrid import HIVECOTEV2
@@ -40,14 +44,14 @@ models = {'RDST Prime':R_DST_Ridge(n_jobs=n_jobs, prime_dilations=True),
           'HC2':HIVECOTEV2(n_jobs=n_jobs)}
 
 # Execute all model once for possible numba compilations
-X_train, _, y_train, _, _ = load_sktime_dataset_split("SmoothSubspace")
+X_train, _, y_train, _, _ = load_UCR_UEA_dataset_split("SmoothSubspace")
 for name in models:
     time_pipe(clone(models[name]), X_train, y_train)
 
 # In[Samples benchmarks]:
 csv_name = 'n_samples_benchmarks.csv'    
 
-X_train, _, y_train, _, _ = load_sktime_dataset_split("Crop")
+X_train, _, y_train, _, _ = load_UCR_UEA_dataset_split("Crop")
 
 #Had to cut number of samples to get results on our cluster.
 n_samples = X_train.shape[0]//3
@@ -76,9 +80,9 @@ for l in lengths:
         df.to_csv(csv_name)
 
 # In[Timepoints benchmarks]:
-csv_name = 'n_timepoints_benchmarks.csv'    
+csv_name = 'benchmark.csv'    
 
-X_train, _, y_train, _, _ = load_sktime_dataset_split("Rock")
+X_train, _, y_train, _, _ = load_UCR_UEA_dataset_split("Rock")
 #Had to cut number of samples to get results on our cluster.
 n_timestamps = X_train.shape[2]
 
@@ -99,4 +103,6 @@ for l in lengths:
             timing.append(time_pipe(mod, x1, y_train))
         df.loc[l, name] = np.mean(timing)
         df.loc[l, name+'_std'] = np.std(timing)
+        print("Saving file to:", os.getcwd())
         df.to_csv(csv_name)
+        print("File saved:", csv_name)
