@@ -53,20 +53,37 @@ print("Accuracy Score for RDST : {}".format(rdst.score(X_test, y_test)))
 ```
 ## 跑论文实验代码
 **本fork内的源码已经调通，按照步骤一步步即可浮现论文结果，该分支里也有我们已经跑出的结果。**
+
 直接跑通代码：
 ```bash
 cd ./PaperScripts
 
 # 跑基准测试
-python benchmark.py # 更建议运行benchmark.ipynb文件，更直观
-# 跑测试模型在UCR数据集上的性能
+python benchmark_new.py 
+# 更建议运行benchmark.ipynb文件，更直观
+
+# 测试模型在UCR数据集上的性能
 python test_models.py
 ```
-对于基准测试， 我们已经跑完的结果路径是：`convst/PaperScripts/benchmark.csv` 和 `convst/PaperScripts/n_samples_benchmarks.csv`。这两个结果中为了在本地跑通，只测试了RDST的四种模型。
+如果`test_models.py`运行时间过长，可以选择只测试单个或部分数据集
+方法：在文件test_models.py里，把
+```python
+dataset_names = return_all_univariate_dataset_names()
+```
+改为
+```python
+dataset_names = np.asarray(["ACSF1", ])
+# "ACSF1"为UCR中第一个数据集名称
+```
 
-对于UCR数据集上的测试，已经跑完的结果是：`convst/PaperScripts/CV_30_results_default.csv`。我们在一台8核48G内存的服务器上跑了近58小时，跑完了大约1/3.因为没钱组服务器了所以没继续跑。
+## 真实的结果
+对于基准测试， 我们已经跑完的结果路径是：`convst/PaperScripts/benchmark.csv` 和 `convst/PaperScripts/n_samples_benchmarks.csv`
+。这两个结果中为了在本地（16Gb内存）跑通，只测试了RDST的四种模型
 
-详细情况请看后面提交的探索研究报告和学习笔记以及ppt。谢谢老师！
+对于UCR数据集上的测试，已经跑出的结果是：`convst/PaperScripts/New_CV_30_results_default.csv`。
+我们在一台8核48G内存的服务器上跑了近**58小时**，跑完了大约1/3.因为没钱组服务器了所以没继续跑。
+
+详细情况看后面提交的探索研究报告和学习笔记以及ppt。谢谢老师！
 
 
 以下是仓库原文档：

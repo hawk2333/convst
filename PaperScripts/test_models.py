@@ -7,28 +7,30 @@ from convst.utils.dataset_utils import return_all_dataset_names, return_all_univ
 from convst.utils.experiments_utils import cross_validate_UCR_UEA
 
 from convst.classifiers import R_DST_Ensemble, R_DST_Ridge
+# 忽略所有warnings
+import warnings
+warnings.filterwarnings('ignore')
 
-print("Imports OK")
+print("导入成功")
 #n_cv = 1 to test only on original train test split.
 n_cv = 30
 n_jobs = -1
 csv_name = 'CV_{}_results_default.csv'.format(
     n_cv)
 
-# List of datasets to test, here, use all datasets ones, (univariate,
-# multivariate, variable length, etc...) see dataset_utils for other choices.
-# e.g. to test on all datasets, change to :
+# 测试的数据集列表，这里使用所有的数据集（单变量、多变量、可变长度等），可以在dataset_utils中查看其他选择。
+# 例如，要测试所有数据集，修改为：
 # dataset_names = return_all_dataset_names()
 dataset_names = return_all_univariate_dataset_names()
 
-# List of models to test
+# 测试的模型列表
 dict_models = {
     "R_DST": R_DST_Ridge,
     "R_DST_Ensemble": R_DST_Ensemble
 }
-
-resume=False
-#Initialize result dataframe
+# False：不继续上次的实验。True：继续上次的实验。
+resume=True
+# 初始化结果DataFrame
 if resume:
     df = pd.read_csv(csv_name, index_col=0)
 else:
@@ -39,7 +41,7 @@ else:
     df.to_csv(csv_name)
 
 for model_name, model_class in dict_models.items():
-    print("Compiling {}".format(model_name))
+    print("编译 {}".format(model_name))
     X = np.random.rand(5,3,50)
     y = np.array([0,0,1,1,1])
     if model_name == 'R_DST_Ensemble':
@@ -57,8 +59,7 @@ for name in dataset_names:
                 n_jobs=n_jobs
             )
             
-            #By default, we use accuracy as score, but other scorer can be passed
-            #as parameters (e.g. by default scorers={"accuracy":accuracy_score})
+            # 默认情况下，使用准确率作为评分，但也可以传递其他评分器作为参数（例如，默认评分器为{"accuracy":accuracy_score}）
             _scores = cross_validate_UCR_UEA(n_cv, name).score(pipeline)
             df.loc[i_df, 'acc_mean'] = _scores['accuracy'].mean()
             df.loc[i_df, 'acc_std'] = _scores['accuracy'].std()
@@ -68,6 +69,6 @@ for name in dataset_names:
             df.loc[i_df, 'model'] = model_name
             df.to_csv(csv_name)
         else:
-            print('Skipping {} : {}'.format(model_name, df.loc[i_df, 'acc_mean']))
+            print('跳过 {} : {}'.format(model_name, df.loc[i_df, 'acc_mean']))
         i_df+=1
     print('---------------------')
