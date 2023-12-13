@@ -10,7 +10,7 @@ from convst.utils.experiments_utils import UCR_stratified_resample, run_pipeline
 from convst.transformers import R_DST
 from sklearn.linear_model import RidgeClassifierCV
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler 
 
 #TODO : UPDATE TO THE NEW API
 
