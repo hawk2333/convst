@@ -1,3 +1,77 @@
+# 此分支用于机器学习大作业
+## 搭建环境
+```bash
+# 创建虚拟环境
+conda create -n MLpro python=3.8
+# 启动虚拟环境
+conda actiavte MLpro
+# 安装 aeon 和必要的库
+conda install scikit-learn 
+conda install scikit-learn-intelex
+conda install numpy
+pip install aeon
+```
+拉取代码
+```bash
+# 进入工作目录(没有需自己创建), 进入虚拟环境
+cd workspace/ML/
+conda activate MLpro
+
+# 按照 readme 的意思.先拉取源码或fork我的这个分支
+git clone https://github.com/baraline/convst.git
+# 或者
+git clone https://github.com/hawk2333/convst.git
+
+cd convst
+
+# pip 安装一下依赖包.(这个包的版本应该不是最新的,但是也是依赖项)
+pip install convst
+pip install toml
+
+# 安装源码的软件包
+python setup.py install
+
+# 如果有 N卡的话,再执行这个命令
+conda install -c numba irr_rt
+#如果找不到irr——rt， 运行
+conda install numba
+```
+搭建好环境之后,用一个小型数据集 Gunpoint 来测试一下 RDST_Ridge 模型的性能
+```python
+from convst.classifiers import R_DST_Ridge
+from convst.utils.dataset_utils import load_UCR_UEA_dataset_split
+
+X_train, X_test, y_train, y_test, _ = load_UCR_UEA_dataset_split('GunPoint')
+
+# First run may be slow due to numba compilations on the first call. 
+# Run a small dataset like GunPoint if this is the first time you call RDST on your system.
+# You can change n_shapelets to 1 to make this process faster. The n_jobs parameter can
+# also be changed to increase speed once numba compilation are done.
+
+rdst = R_DST_Ridge(n_shapelets=10_000, n_jobs=1).fit(X_train, y_train)
+print("Accuracy Score for RDST : {}".format(rdst.score(X_test, y_test)))
+```
+## 跑论文实验代码
+**本fork内的源码已经调通，按照步骤一步步即可浮现论文结果，该分支里也有我们已经跑出的结果。**
+直接跑通代码：
+```bash
+cd ./PaperScripts
+
+# 跑基准测试
+python benchmark.py # 更建议运行benchmark.ipynb文件，更直观
+# 跑测试模型在UCR数据集上的性能
+python test_models.py
+```
+对于基准测试， 我们已经跑完的结果路径是：`convst/PaperScripts/benchmark.csv` 和 `convst/PaperScripts/n_samples_benchmarks.csv`。这两个结果中为了在本地跑通，只测试了RDST的四种模型。
+
+对于UCR数据集上的测试，已经跑完的结果是：`convst/PaperScripts/CV_30_results_default.csv`。我们在一台8核48G内存的服务器上跑了近58小时，跑完了大约1/3.因为没钱组服务器了所以没继续跑。
+
+详细情况请看后面提交的探索研究报告和学习笔记以及ppt。谢谢老师！
+
+
+以下是仓库原文档：
+---
+
 # This package is moving to the aeon-toolkit.
 Starting from v0.3.0, this package will not be updated, bugfixes will still be included if issues are raised.
 You can already find RDST in the Aeon package at https://github.com/aeon-toolkit/ . Further improvements are planned for further speeding up RDST, these improvement will only be implemented in aeon.
