@@ -23,15 +23,16 @@ csv_name = 'CV_{}_results_default.csv'.format(
 # dataset_names = return_all_dataset_names()
 dataset_names = return_all_univariate_dataset_names()
 
-# 测试的模型列表
+
+# 测试的模型列表，这里使用所有的模型，可以在classifiers中查看其他选择。
 dict_models = {
-    "R_DST": R_DST_Ridge,
-    "R_DST_Ensemble": R_DST_Ensemble
+    "RDST Prime":R_DST_Ridge,
+    "RDST Ensemble Prime":R_DST_Ensemble,
 }
 # False：不继续上次的实验。True：继续上次的实验。
-resume=True
+resume=False
 # 初始化结果DataFrame
-if resume:
+if resume :
     df = pd.read_csv(csv_name, index_col=0)
 else:
     df = pd.DataFrame(0, index=np.arange(dataset_names.shape[0]*len(dict_models)),
@@ -44,10 +45,12 @@ for model_name, model_class in dict_models.items():
     print("编译 {}".format(model_name))
     X = np.random.rand(5,3,50)
     y = np.array([0,0,1,1,1])
-    if model_name == 'R_DST_Ensemble':
-        model_class(n_shapelets_per_estimator=1).fit(X,y).predict(X)
     if model_name == 'R_DST_Ridge':
-        model_class(n_shapelets=1).fit(X,y).predict(X)
+        model_class(n_shapelets=1, prime_dilations=True,n_jobs=-1).fit(X,y).predict(X)
+    if model_name == 'R_DST_Ensemble':
+        model_class(n_shapelets_per_estimator=1, prime_dilations=True,n_jobs=-1).fit(X,y).predict(X)
+
+
 
 i_df=0
 for name in dataset_names:
@@ -71,4 +74,5 @@ for name in dataset_names:
         else:
             print('跳过 {} : {}'.format(model_name, df.loc[i_df, 'acc_mean']))
         i_df+=1
-    print('---------------------')
+    print('---------------------')    
+
